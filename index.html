@@ -29,7 +29,6 @@
             position: relative;
         }
 
-        /* Кнопка "Домой" в левом верхнем углу */
         .home-btn {
             position: fixed;
             top: 20px;
@@ -335,7 +334,6 @@
     </style>
 </head>
 <body>
-    <!-- Кнопка "Домой" -->
     <a href="index.html" class="home-btn" title="На главную">
         <img src="./home.svg" alt="Домой">
     </a>
@@ -350,39 +348,39 @@
             </div>
         </div>
 
-        <div class="status" id="status">Нажми на птичку, чтобы послушать </div>
+        <div class="status" id="status">Нажми на птичку, чтобы послушать 🔊</div>
 
         <div class="birds-grid">
             <div class="bird-card" data-id="1">
                 <div class="bird-card__image-wrapper">
-                    <img src="./assets/images/forms/crown.png" alt="ворона">
+                    <img src="./img/form/crown.png" alt="ворона">
                 </div>
                 <div class="bird-card__name">
                     Ворона
-                    <span class="sound-icon">🔊</span>
+                    <span class="sound-icon"></span>
                 </div>
             </div>
             <div class="bird-card" data-id="2">
                 <div class="bird-card__image-wrapper">
-                    <img src="./assets/images/forms/cock.png" alt="петух">
+                    <img src="./img/form/cock.png" alt="петух">
                 </div>
                 <div class="bird-card__name">
                     Петух
-                    <span class="sound-icon"></span>
+                    <span class="sound-icon">🔊</span>
                 </div>
             </div>
             <div class="bird-card" data-id="3">
                 <div class="bird-card__image-wrapper">
-                    <img src="./assets/images/forms/gull.png" alt="чайка">
+                    <img src="./img/form/gull.png" alt="чайка">
                 </div>
                 <div class="bird-card__name">
                     Чайка
-                    <span class="sound-icon">🔊</span>
+                    <span class="sound-icon"></span>
                 </div>
             </div>
             <div class="bird-card" data-id="4">
                 <div class="bird-card__image-wrapper">
-                    <img src="./assets/images/forms/goldfinch.png" alt="щегол">
+                    <img src="./img/form/goldfinch.png" alt="щегол">
                 </div>
                 <div class="bird-card__name">
                     Щегол
@@ -402,7 +400,7 @@
                 </a>
             </div>
             <div class="fox-image">
-                <img src="./assets/images/forms/лисичка.png" alt="лисичка">
+                <img src="./img/form/лисичка.png" alt="лисичка">
             </div>
         </div>
 
@@ -410,14 +408,14 @@
 
         <div class="popup" id="popupYes">
             <div class="popup__content">
-                <img src="./assets/images/forms/FineFox.png" alt="правильно">
+                <img src="./img/form/FineFox.png" alt="правильно">
                 <button class="popup__btn success" id="closeYes">ОК</button>
             </div>
         </div>
 
         <div class="popup" id="popupNo">
             <div class="popup__content">
-                <img src="./assets/images/forms/BadlyFox.png" alt="неправильно">
+                <img src="./img/form/BadlyFox.png" alt="неправильно">
                 <button class="popup__btn error" id="closeNo">ОК</button>
             </div>
         </div>
@@ -497,7 +495,7 @@
                 document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing'));
                 this.classList.add('playing');
 
-                status.textContent = `🎵 ${bird.name}`;
+                status.textContent = ` ${bird.name}`;
                 playAudio(bird.src)
                     .then(() => {
                         status.textContent = `🎶 ${bird.name} поёт`;
