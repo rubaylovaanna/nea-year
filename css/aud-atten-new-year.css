@@ -1,1 +1,190 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // === КОНФИГУРАЦИЯ И ДАННЫЕ ===
+    const soundsData = [
+        { id: 'bells', name: 'Колокольчики', audioId: 'audio-bells' },
+        { id: 'chimes', name: 'Куранты', audioId: 'audio-chimes' },
+        { id: 'fire', name: 'Бенгальский огонь', audioId: 'audio-fire' },
+        { id: 'whistle', name: 'Свистулька', audioId: 'audio-whistle' }
+    ];
 
+    // === СОСТОЯНИЕ ИГРЫ ===
+    let state = {
+        score: 0,
+        currentTarget: null,
+        selectedOption: null,
+        isPlaying: false
+    };
+
+    // === DOM ЭЛЕМЕНТЫ ===
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    
+    const ui = {
+        score: document.getElementById('score'),
+        btnListen: document.getElementById('btn-listen'),
+        options: document.querySelectorAll('.option-card'),
+        btnCheck: document.getElementById('btn-check'),
+        popup: document.getElementById('popup-overlay'),
+        popupImg: document.getElementById('popup-img'),
+        popupTitle: document.getElementById('popup-title'),
+        popupText: document.getElementById('popup-text'),
+        btnPopupClose: document.getElementById('btn-popup-close')
+    };
+
+    // === ИНИЦИАЛИЗАЦИЯ ===
+    function init() {
+        // Останавливаем все аудио при загрузке
+        document.querySelectorAll('audio').forEach(audio => audio.pause());
+        
+        document.getElementById('btn-start').addEventListener('click', startGame);
+        document.getElementById('btn-back').addEventListener('click', goBackToMenu);
+        ui.btnListen.addEventListener('click', playRandomSound);
+        ui.btnCheck.addEventListener('click', checkAnswer);
+        ui.btnPopupClose.addEventListener('click', nextRound);
+
+        // Клик по карточкам
+        ui.options.forEach(card => {
+            card.addEventListener('click', () => selectCard(card));
+        });
+        
+        // Создаём снежинки на игровом экране
+        createSnowflakes();
+    }
+
+    // === ЛОГИКА ИГРЫ ===
+    function startGame() {
+        // Скрываем стартовый экран
+        startScreen.style.display = 'none';
+        // Показываем игровой экран
+        gameScreen.classList.remove('hidden');
+        state.score = 0;
+        updateScore();
+        nextRound();
+    }
+
+    function goBackToMenu() {
+        // Останавливаем звук, если играет
+        document.querySelectorAll('audio').forEach(a => a.pause());
+        ui.btnListen.classList.remove('playing');
+        // Показываем стартовый экран
+        startScreen.style.display = 'flex';
+        // Скрываем игровой экран
+        gameScreen.classList.add('hidden');
+    }
+
+    function nextRound() {
+        closePopup();
+        state.selectedOption = null;
+        state.currentTarget = soundsData[Math.floor(Math.random() * soundsData.length)];
+        
+        // Сброс UI
+        ui.options.forEach(c => c.classList.remove('selected'));
+        ui.btnCheck.disabled = true;
+        ui.btnListen.classList.remove('playing');
+    }
+
+    function playRandomSound() {
+        if (!state.currentTarget) return;
+
+        // Сброс предыдущего звука
+        document.querySelectorAll('audio').forEach(a => {
+            a.pause();
+            a.currentTime = 0;
+        });
+
+        const audioEl = document.getElementById(state.currentTarget.audioId);
+        if (audioEl) {
+            ui.btnListen.classList.add('playing');
+            
+            audioEl.play().catch(e => console.error('Ошибка воспроизведения:', e));
+            
+            audioEl.onended = () => {
+                ui.btnListen.classList.remove('playing');
+            };
+        }
+    }
+
+    function selectCard(card) {
+        ui.options.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state.selectedOption = card.dataset.sound;
+        ui.btnCheck.disabled = false;
+        
+        // Легкая вибрация на мобильных при выборе
+        if (navigator.vibrate) navigator.vibrate(10);
+    }
+
+    function checkAnswer() {
+        if (!state.selectedOption || !state.currentTarget) return;
+
+        const isCorrect = state.selectedOption === state.currentTarget.id;
+        
+        if (isCorrect) {
+            state.score++;
+            updateScore();
+            showPopup(true);
+        } else {
+            showPopup(false);
+        }
+    }
+
+    function updateScore() {
+        ui.score.textContent = state.score;
+        // Анимация счета
+        ui.score.parentElement.style.transform = 'scale(1.3)';
+        setTimeout(() => ui.score.parentElement.style.transform = 'scale(1)', 300);
+    }
+
+    // === ПОПАП И АНИМАЦИИ ===
+    function showPopup(isCorrect) {
+        if (isCorrect) {
+            ui.popupImg.src = 'img/popup/fine-fox.png';
+            ui.popupTitle.textContent = 'Отлично! ';
+            ui.popupTitle.style.color = '#2ED573';
+            ui.popupText.textContent = `Это были ${state.currentTarget.name}. Так держать!`;
+        } else {
+            ui.popupImg.src = 'img/popup/badly-fox.png';
+            ui.popupTitle.textContent = 'Не совсем...';
+            ui.popupTitle.style.color = '#FF4757';
+            ui.popupText.textContent = `Это звучали ${state.currentTarget.name}. Попробуй еще раз!`;
+        }
+        
+        ui.popup.classList.remove('hidden');
+        // Моушн: тряска попапа при ошибке
+        if (!isCorrect) {
+            const content = document.getElementById('popup-content');
+            content.style.animation = 'none';
+            content.offsetHeight; /* trigger reflow */
+            content.style.animation = 'shakePopup 0.4s ease-in-out';
+        }
+    }
+
+    function closePopup() {
+        ui.popup.classList.add('hidden');
+    }
+
+    // === СНЕЖИНКИ НА ЭКРАНЕ ===
+    function createSnowflakes() {
+        if (!gameScreen) return;
+        
+        // Удаляем старые снежинки если есть
+        const oldSnowflakes = gameScreen.querySelectorAll('.snowflake-fall');
+        oldSnowflakes.forEach(s => s.remove());
+        
+        // Создаём новые снежинки
+        for (let i = 0; i < 25; i++) {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake-fall';
+            snowflake.innerHTML = '❅';
+            snowflake.style.left = Math.random() * 100 + '%';
+            snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            snowflake.style.animationDelay = Math.random() * 5 + 's';
+            snowflake.style.opacity = Math.random() * 0.5 + 0.3;
+            snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+            gameScreen.appendChild(snowflake);
+        }
+    }
+
+    // Запуск
+    init();
+});
