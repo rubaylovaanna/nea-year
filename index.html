@@ -3,529 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Птицы — изучаем голоса</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-image: url('img/background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-        }
-
-        /* Кнопка "Домой" в левом верхнем углу */
-        .home-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            text-decoration: none;
-            z-index: 100;
-            transition: transform 0.2s;
-        }
-
-        .home-btn:active {
-            transform: scale(0.9);
-        }
-
-        .home-btn img {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .title {
-            font-size: 52px;
-            font-weight: 900;
-            color: #2E7D32;
-            text-shadow: 3px 3px 0px rgba(255,255,255,0.8);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
-
-        .subtitle {
-            font-size: 20px;
-            color: #1B5E20;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-weight: 700;
-            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
-        }
-
-        .status {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 15px 25px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            font-size: 20px;
-            font-weight: 700;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-            color: #2E7D32;
-        }
-
-        .birds-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-            margin-bottom: 40px;
-            padding: 0 20px;
-        }
-
-        .bird-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 25px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            transition: transform 0.3s;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .bird-card:active {
-            transform: scale(0.95);
-        }
-
-        .bird-card.playing {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-        }
-
-        .bird-card__image-wrapper {
-            height: 220px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
-        }
-
-        .bird-card img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .bird-card__name {
-            padding: 18px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: auto;
-        }
-
-        .bird-card[data-id="1"] .bird-card__name {
-            background: linear-gradient(135deg, #9B7ED7 0%, #7B68C4 100%);
-        }
-
-        .bird-card[data-id="2"] .bird-card__name {
-            background: linear-gradient(135deg, #FFB347 0%, #FF8C42 100%);
-        }
-
-        .bird-card[data-id="3"] .bird-card__name {
-            background: linear-gradient(135deg, #7DD3FC 0%, #38BDF8 100%);
-        }
-
-        .bird-card[data-id="4"] .bird-card__name {
-            background: linear-gradient(135deg, #5EEAD4 0%, #14B8A6 100%);
-        }
-
-        .sound-icon {
-            font-size: 24px;
-            opacity: 0.9;
-        }
-
-        .fox-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 25px;
-            padding: 30px;
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .fox-text {
-            flex: 1;
-        }
-
-        .fox-text h3 {
-            font-size: 22px;
-            color: #2E7D32;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .fox-text p {
-            font-size: 16px;
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .btn-start-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg, #5EEAD4 0%, #14B8A6 100%);
-            color: white;
-            padding: 15px 35px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 18px;
-            box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
-            transition: transform 0.2s;
-        }
-
-        .btn-start-link:hover {
-            transform: scale(1.05);
-        }
-
-        .fox-image {
-            width: 220px;
-            height: 220px;
-            flex-shrink: 0;
-        }
-
-        .fox-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .popup.active {
-            display: flex;
-        }
-
-        .popup__content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            max-width: 300px;
-            animation: scaleIn 0.3s;
-        }
-
-        .popup__content img {
-            width: 150px;
-            margin-bottom: 15px;
-        }
-
-        .popup__btn {
-            padding: 12px 40px;
-            border-radius: 25px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
-            font-family: 'Nunito', sans-serif;
-        }
-
-        .popup__btn.success { background: #4CAF50; }
-        .popup__btn.error { background: #F44336; }
-
-        @keyframes scaleIn {
-            from { transform: scale(0.7); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        @media (max-width: 1024px) {
-            .birds-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .title { font-size: 40px; }
-            .subtitle { font-size: 16px; }
-            .birds-grid { gap: 15px; padding: 0; }
-            .bird-card__image-wrapper { height: 180px; }
-            .fox-section {
-                flex-direction: column;
-                text-align: center;
-            }
-            .fox-image {
-                width: 180px;
-                height: 180px;
-            }
-            .home-btn {
-                top: 15px;
-                left: 15px;
-                width: 45px;
-                height: 45px;
-            }
-            .home-btn img {
-                width: 24px;
-                height: 24px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .title { font-size: 32px; }
-            .birds-grid { gap: 10px; }
-            .bird-card__image-wrapper { height: 150px; }
-            .bird-card__name { 
-                padding: 12px; 
-                font-size: 16px; 
-            }
-            .fox-image { width: 150px; height: 150px; }
-        }
-    </style>
+    <title>Что звучит? Угадай звук</title>
+    <link rel="icon" href="../../../img/favicon/favbg.svg" type="image/x-icon">
+    <link rel="stylesheet" href="css/aud-atten-new-year.css">
 </head>
 <body>
-    <!-- Кнопка "Домой" -->
-    <a href="index.html" class="home-btn" title="На главную">
-        <img src="home.svg" alt="Домой">
-    </a>
 
-    <div class="container">
-        <div class="header">
-            <h1 class="title">Птицы</h1>
-            <div class="subtitle">
-                <span>🌸</span>
-                Угадай звук
-                <span>🌿</span>
+    <!-- ЭКРАН 1: Стартовый экран с фоновой картинкой на весь экран -->
+    <section id="start-screen" class="start-screen-new">
+        <div class="main-card">
+            <div class="fox-container">
+                <img src="img/header/fox-new-year.png" alt="Новогодняя лиса" class="mascot-new">
+            </div>
+            
+            <div class="speech-bubble-new">
+                <p>Динь-динь-динь! Новый год уже близко!<br>Помоги мне узнать праздничные звуки!</p>
+            </div>
+            
+            <h1 class="game-title-new">Что звучит?</h1>
+            
+            <button id="btn-start" class="btn-start-new">
+                <span class="play-icon">▶</span>
+                Начать игру
+            </button>
+        </div>
+    </section>
+
+    <!-- ЭКРАН 2: Игровой процесс (НОВЫЙ ДИЗАЙН) -->
+    <section id="game-screen" class="game-screen-new hidden">
+        <!-- Фоновая картинка -->
+        <div class="game-background"></div>
+        
+        <!-- Верхняя панель с профилем -->
+        <header class="game-header">
+            <div class="user-profile">
+                <img src="img/header/fox-new-year.png" alt="Аватар" class="user-avatar">
+                <div class="user-info">
+                    <span class="user-name">Малыш</span>
+                    <div class="user-stars">
+                        <span class="star-icon">⭐</span>
+                        <span id="score">0</span>
+                    </div>
+                </div>
+            </div>
+            <button id="btn-back" class="btn-back-new" aria-label="Назад">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Заголовок -->
+        <div class="game-title-section">
+            <h2 class="main-title">Слушай звуки</h2>
+            <p class="subtitle">Нажми «Послушать звук» и выбери, что это!</p>
+        </div>
+
+        <!-- Лиса в круге с нотами -->
+        <div class="fox-circle-container">
+            <div class="music-note note-1"></div>
+            <div class="music-note note-2">🎶</div>
+            <div class="music-note note-3">🎵</div>
+            <div class="fox-circle">
+                <img src="img/header/fox-new-year.png" alt="Лиса" class="fox-circle-img">
             </div>
         </div>
 
-        <div class="status" id="status">Нажми на птичку, чтобы послушать 🔊</div>
+        <!-- Кнопка послушать звук -->
+        <button id="btn-listen" class="btn-listen-new">
+            <span class="speaker-icon">🔊</span>
+            Послушать звук
+        </button>
 
-        <div class="birds-grid">
-            <div class="bird-card" data-id="1">
-                <div class="bird-card__image-wrapper">
-                    <img src="img/form/crown.png" alt="ворона">
-                </div>
-                <div class="bird-card__name">
-                    Ворона
-                    <span class="sound-icon">🔊</span>
-                </div>
+        <!-- Карточки с вариантами -->
+        <div class="options-container">
+            <div class="option-card" data-sound="bells">
+                <img src="img/form/bells.png" alt="Колокольчики" class="option-img">
+                <span class="option-label">Колокольчики</span>
             </div>
-            <div class="bird-card" data-id="2">
-                <div class="bird-card__image-wrapper">
-                    <img src="img/form/cock.png" alt="петух">
-                </div>
-                <div class="bird-card__name">
-                    Петух
-                    <span class="sound-icon">🔊</span>
-                </div>
+            <div class="option-card" data-sound="chimes">
+                <img src="img/form/chimes.png" alt="Куранты" class="option-img">
+                <span class="option-label">Куранты</span>
             </div>
-            <div class="bird-card" data-id="3">
-                <div class="bird-card__image-wrapper">
-                    <img src="img/form/gull.png" alt="чайка">
-                </div>
-                <div class="bird-card__name">
-                    Чайка
-                    <span class="sound-icon">🔊</span>
-                </div>
+            <div class="option-card" data-sound="fire">
+                <img src="img/form/fire.png" alt="Бенгальский огонь" class="option-img">
+                <span class="option-label">Бенгальский огонь</span>
             </div>
-            <div class="bird-card" data-id="4">
-                <div class="bird-card__image-wrapper">
-                    <img src="img/form/goldfinch.png" alt="щегол">
-                </div>
-                <div class="bird-card__name">
-                    Щегол
-                    <span class="sound-icon">🔊</span>
-                </div>
+            <div class="option-card" data-sound="whistle">
+                <img src="img/form/whistle.png" alt="Свистулька" class="option-img">
+                <span class="option-label">Свистулька</span>
             </div>
         </div>
 
-        <div class="fox-section">
-            <div class="fox-text">
-                <h3>Запомни всех птиц!</h3>
-                <p>Наша лисичка обожает слушать пение птиц в лесу! Давай поиграем с ней в угадайку! 
-                    Запомни крик всех птиц, когда будешь готов - нажми кнопку старт. Лисичка будет проверять, как ты запомнил.</p>
-                <a href="game.html" class="btn-start-link">
-                    СТАРТ
-                    <span>→</span>
-                </a>
-            </div>
-            <div class="fox-image">
-                <img src="img/form/лисичка.png" alt="лисичка">
-            </div>
+        <!-- Кнопка проверить ответ -->
+        <button id="btn-check" class="btn-check-new" disabled>
+            <span class="check-icon">✓</span>
+            Проверить ответ
+        </button>
+
+        <!-- Снеговик -->
+        <div class="snowman-decoration">
+            <img src="img/header/fox-new-year.png" alt="Снеговик" class="snowman-img" style="display:none;">
+            <div class="snowman-placeholder">⛄</div>
         </div>
+    </section>
 
-        <audio id="audio" preload="auto" playsinline webkit-playsinline></audio>
-
-        <div class="popup" id="popupYes">
-            <div class="popup__content">
-                <img src="img/form/FineFox.png" alt="правильно">
-                <button class="popup__btn success" id="closeYes">ОК</button>
-            </div>
-        </div>
-
-        <div class="popup" id="popupNo">
-            <div class="popup__content">
-                <img src="img/form/BadlyFox.png" alt="неправильно">
-                <button class="popup__btn error" id="closeNo">ОК</button>
-            </div>
+    <!-- МОДАЛЬНОЕ ОКНО (Результат) -->
+    <div id="popup-overlay" class="popup-overlay hidden">
+        <div class="popup-content" id="popup-content">
+            <img id="popup-img" src="" alt="Результат" class="popup-img">
+            <h2 id="popup-title"></h2>
+            <p id="popup-text"></p>
+            <button id="btn-popup-close" class="btn-popup-new">Продолжить!</button>
         </div>
     </div>
 
-    <script>
-        const birds = [
-            { id: 1, name: 'Ворона', src: 'audio/1crow.ogg' },
-            { id: 2, name: 'Петух', src: 'audio/2rooster.ogg' },
-            { id: 3, name: 'Чайка', src: 'audio/3gull.ogg' },
-            { id: 4, name: 'Щегол', src: 'audio/4goldfinch.ogg' }
-        ];
+    <!-- Аудио элементы -->
+    <audio src="audio/bells.mp4" id="audio-bells" preload="auto"></audio>
+    <audio src="audio/chimes.mp4" id="audio-chimes" preload="auto"></audio>
+    <audio src="audio/fire.mp4" id="audio-fire" preload="auto"></audio>
+    <audio src="audio/whistle.mp4" id="audio-whistle" preload="auto"></audio>
 
-        const audio = document.getElementById('audio');
-        const status = document.getElementById('status');
-        const popupYes = document.getElementById('popupYes');
-        const popupNo = document.getElementById('popupNo');
-        const closeYes = document.getElementById('closeYes');
-        const closeNo = document.getElementById('closeNo');
-        const birdCards = document.querySelectorAll('.bird-card');
-
-        let unlocked = false;
-
-        function unlock() {
-            if (unlocked) return;
-            audio.muted = true;
-            audio.play().then(() => {
-                audio.pause();
-                audio.muted = false;
-                unlocked = true;
-            }).catch(() => {});
-            document.removeEventListener('touchstart', unlock);
-            document.removeEventListener('click', unlock);
-        }
-
-        document.addEventListener('touchstart', unlock, {passive: true});
-        document.addEventListener('click', unlock);
-
-        function playAudio(src) {
-            return new Promise((resolve, reject) => {
-                audio.pause();
-                audio.currentTime = 0;
-                audio.src = src;
-                audio.load();
-
-                const onCanPlay = () => {
-                    cleanup();
-                    const playPromise = audio.play();
-                    if (playPromise !== undefined) {
-                        playPromise.then(resolve).catch(reject);
-                    } else {
-                        resolve();
-                    }
-                };
-
-                const onError = () => {
-                    cleanup();
-                    reject(new Error('Audio error'));
-                };
-
-                const cleanup = () => {
-                    audio.removeEventListener('canplay', onCanPlay);
-                    audio.removeEventListener('error', onError);
-                };
-
-                audio.addEventListener('canplay', onCanPlay);
-                audio.addEventListener('error', onError);
-            });
-        }
-
-        birdCards.forEach(card => {
-            card.addEventListener('click', function() {
-                const id = parseInt(this.dataset.id);
-                const bird = birds.find(b => b.id === id);
-                if (!bird) return;
-
-                document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing'));
-                this.classList.add('playing');
-
-                status.textContent = `🎵 ${bird.name}`;
-                playAudio(bird.src)
-                    .then(() => {
-                        status.textContent = `🎶 ${bird.name} поёт`;
-                    })
-                    .catch(() => {
-                        status.textContent = '⚠️ Ошибка';
-                    });
-
-                setTimeout(() => {
-                    this.classList.remove('playing');
-                }, 1000);
-            });
-        });
-
-        closeYes.addEventListener('click', () => {
-            popupYes.classList.remove('active');
-            status.textContent = 'Нажми на птичку, чтобы послушать 🔊';
-        });
-
-        closeNo.addEventListener('click', () => {
-            popupNo.classList.remove('active');
-            status.textContent = 'Нажми на птичку, чтобы послушать 🔊';
-        });
-
-        audio.addEventListener('ended', () => {
-            status.textContent = 'Нажми на птичку, чтобы послушать 🔊';
-            document.querySelectorAll('.bird-card').forEach(c => c.classList.remove('playing'));
-        });
-    </script>
+    <script src="js/aud-atten-new-year.js"></script>
 </body>
 </html>
