@@ -3,11 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
     // === КОНФИГУРАЦИЯ ЗВУКОВ С HOWLER.JS ===
+    // ИСПРАВЛЕНО: везде теперь .mp3 и убраны лишние "./" для стабильности на GitHub
     const soundsConfig = {
-        bells: { src: './audio/bells.mp3', volume: 0.8 },
-        chimes: { src: './audio/chimes.mp3', volume: 0.8 },
-        fire: { src: './audio/fire.mp3', volume: 0.8 },
-        whistle: { src: './audio/whistle.mp4', volume: 0.8 }
+        bells: { src: 'audio/bells.mp3', volume: 0.8 },
+        chimes: { src: 'audio/chimes.mp3', volume: 0.8 },
+        fire: { src: 'audio/fire.mp3', volume: 0.8 },
+        whistle: { src: 'audio/whistle.mp3', volume: 0.8 } // <-- БЫЛО .mp4, СТАЛО .mp3
     };
 
     // Создаём объекты Howl для каждого звука
@@ -16,13 +17,20 @@ document.addEventListener('DOMContentLoaded', () => {
         sounds[key] = new Howl({
             src: [soundsConfig[key].src],
             volume: soundsConfig[key].volume,
-            html5: true, // Используем HTML5 Audio для лучшей совместимости с iOS
+            html5: true, // Оставляем true для максимальной совместимости с iOS
             preload: true,
-            onloaderror: function() {
-                console.error(`Ошибка загрузки звука: ${key}`);
+            onload: function() {
+                console.log(`✅ Звук загружен: ${key}`);
             },
-            onplayerror: function() {
-                console.error(`Ошибка воспроизведения: ${key}`);
+            onloaderror: function(id, error) {
+                console.error(`❌ Ошибка загрузки звука ${key}:`, error);
+            },
+            onplayerror: function(id, error) {
+                console.error(`❌ Ошибка воспроизведения ${key}:`, error);
+                // Если ошибка из-за блокировки iOS, пытаемся разблокировать
+                if (isIOS && !state.audioUnlocked) {
+                    unlockAudio();
+                }
             }
         });
     });
@@ -80,31 +88,31 @@ document.addEventListener('DOMContentLoaded', () => {
         createSnowflakes();
         
         console.log('🎄 Игра инициализирована с Howler.js');
-        console.log('🔊 Звуки загружены:', Object.keys(sounds));
     }
 
     // === РАЗБЛОКИРОВКА АУДИО НА iOS ===
     function unlockAudio() {
         if (state.audioUnlocked) return;
         
-        // Проигрываем тишину для разблокировки аудио контекста
-        const unlock = new Howl({
-            src: ['./audio/bells.mp3'],
-            volume: 0.001,
-            html5: true
-        });
-        
-        unlock.play();
-        setTimeout(() => {
-            unlock.stop();
-            state.audioUnlocked = true;
-            console.log('🔓 Аудио разблокировано');
-        }, 100);
+        console.log('🔓 Попытка разблокировки аудио...');
+        // Используем уже загруженный звук для разблокировки контекста
+        const unlockSound = sounds['bells'];
+        if (unlockSound) {
+            unlockSound.volume(0.001); // Делаем почти бесшумным
+            unlockSound.play();
+            
+            setTimeout(() => {
+                unlockSound.stop();
+                unlockSound.volume(0.8); // Возвращаем нормальную громкость
+                state.audioUnlocked = true;
+                console.log('✅ Аудио успешно разблокировано!');
+            }, 100);
+        }
     }
 
     // === ЛОГИКА ИГРЫ ===
     function startGame() {
-        // Разблокируем аудио при старте игры
+        // Гарантируем разблокировку аудио при старте игры
         if (isIOS && !state.audioUnlocked) {
             unlockAudio();
         }
@@ -138,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.btnCheck.disabled = true;
         ui.btnListen.classList.remove('playing');
         
-        console.log('🎯 Новый раунд. Правильный ответ:', state.currentTarget.name);
+        console.log('🎯 Новый раунд. Цель:', state.currentTarget.name);
     }
 
     function playRandomSound() {
@@ -148,12 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const sound = sounds[soundId];
         
         if (!sound) {
-            console.error('Звук не найден:', soundId);
-            alert('Ошибка: звук не загружен');
+            console.error('❌ Звук не найден:', soundId);
+            alert('Ошибка: звук не загружен. Проверьте консоль.');
             return;
         }
 
-        // Останавливаем все звуки
+        // Останавливаем все остальные звуки
         Object.values(sounds).forEach(s => {
             if (s.playing()) {
                 s.stop();
@@ -166,28 +174,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // Воспроизводим звук
         try {
             sound.play();
-            console.log(' Воспроизводится:', soundId);
+            console.log('🔊 Воспроизводится:', soundId);
             
-            // Когда звук закончится
+            // Когда звук закончится, убираем анимацию
             sound.once('end', () => {
                 ui.btnListen.classList.remove('playing');
                 console.log('✅ Звук завершён');
             });
             
-            // Таймаут на случай ошибки
+            // Страховочный таймаут на случай, если событие 'end' не сработает
             setTimeout(() => {
                 ui.btnListen.classList.remove('playing');
             }, 10000);
             
         } catch (error) {
-            console.error('Ошибка воспроизведения:', error);
+            console.error('❌ Критическая ошибка воспроизведения:', error);
             ui.btnListen.classList.remove('playing');
-            
-            // Если на iOS - пробуем разблокировать
-            if (isIOS && !state.audioUnlocked) {
-                unlockAudio();
-                alert('Нажмите ещё раз, чтобы услышать звук');
-            }
         }
     }
 
@@ -197,12 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
         state.selectedOption = card.dataset.sound;
         ui.btnCheck.disabled = false;
         
-        // Вибрация только на Android
+        // Вибрация только на Android (iOS не поддерживает navigator.vibrate)
         if (!isIOS && navigator.vibrate) {
             navigator.vibrate(10);
         }
-        
-        console.log('👆 Выбрано:', state.selectedOption);
     }
 
     function checkAnswer() {
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isCorrect) {
             const content = document.getElementById('popup-content');
             content.style.animation = 'none';
-            content.offsetHeight; // trigger reflow
+            content.offsetHeight; // trigger reflow для перезапуска анимации
             content.style.animation = 'shakePopup 0.4s ease-in-out';
         }
     }
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const oldSnowflakes = gameScreen.querySelectorAll('.snowflake-fall');
         oldSnowflakes.forEach(s => s.remove());
         
-        // На iOS меньше снежинок для производительности
+        // На iOS меньше снежинок для экономии батареи и производительности
         const count = isIOS ? 15 : 25;
         
         for (let i = 0; i < count; i++) {
