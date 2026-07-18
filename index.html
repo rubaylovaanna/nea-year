@@ -6,18 +6,10 @@
     <title>Что звучит? Угадай звук</title>
     <link rel="icon" href="../../../img/favicon/favbg.svg" type="image/x-icon">
     
-    <!-- CSS с правильным путем -->
-    <link rel="stylesheet" href="./css/aud-atten-new-year.css">
+    <!-- Howler.js для лучшего звука -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     
-    <!-- Временные стили для проверки -->
-    <style>
-        /* Если основной CSS не загрузится, хотя бы будет фон */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/aud-atten-new-year.css">
 </head>
 <body>
 
@@ -47,8 +39,9 @@
         
         <header class="game-header">
             <div class="user-profile">
+                <img src="./img/header/fox-new-year.png" alt="Аватар" class="user-avatar">
                 <div class="user-info">
-                    <span class="user-name">Счет</span>
+                    <span class="user-name">Малыш</span>
                     <div class="user-stars">
                         <span class="star-icon">⭐</span>
                         <span id="score">0</span>
@@ -76,7 +69,7 @@
         </div>
 
         <button id="btn-listen" class="btn-listen-new">
-            <span class="speaker-icon"></span>
+            <span class="speaker-icon">🔊</span>
             Послушать звук
         </button>
 
@@ -119,12 +112,9 @@
         </div>
     </div>
 
-    <!-- Аудио -->
-    <audio src="./audio/bells.mp4" id="audio-bells" preload="auto"></audio>
-    <audio src="./audio/chimes.mp4" id="audio-chimes" preload="auto"></audio>
-    <audio src="./audio/fire.mp4" id="audio-fire" preload="auto"></audio>
-    <audio src="./audio/whistle.mp4" id="audio-whistle" preload="auto"></audio>
+    <!-- УБРАЛИ HTML5 audio элементы - теперь используем Howler.js -->
 
     <script src="./js/aud-atten-new-year.js"></script>
 </body>
+</html>
 </html>
